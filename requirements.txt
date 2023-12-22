@@ -1,0 +1,4 @@
+python-nomad == 2.0.0
+requests
+rich
+typer
