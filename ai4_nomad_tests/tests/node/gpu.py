@@ -22,3 +22,8 @@ def node_info(
 
     # Check node metadata
     assert n['Meta']['compute'] == 'true'
+
+    # Check if GPU devices are detected
+    devices = n['NodeResources']['Devices']
+    assert devices, "No (GPU) device detected in node"
+    assert [d['Type'] == 'gpu' for d in devices], "Devices detected in node but not GPU"
