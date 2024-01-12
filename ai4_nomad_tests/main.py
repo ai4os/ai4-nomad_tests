@@ -58,14 +58,14 @@ def run(
             if "traefik" in tags:
                 tests.node.traefik.node_info(nid)
 
+            elif "gpu" in tags:
+                # GPU specific tests
+                tests.node.gpu.node_info(nid)
+
             elif "cpu" in tags or "gpu" in tags:
                 # GPU nodes should also be tested as CPU nodes
                 tests.node.cpu.node_info(nid)
                 tests.node.cpu.deployment(nid)
-
-            elif "gpu" in tags:
-                # GPU specific tests
-                tests.node.gpu.node_info(nid)
 
             else:
                 raise Exception(
