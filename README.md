@@ -24,7 +24,7 @@ order know how to generate an EGI token.
 
 Once this is ready run:
 ```bash
-pip install -e
+pip install -e .
 ```
 
 ## Usage
