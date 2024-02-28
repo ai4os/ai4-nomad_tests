@@ -31,7 +31,7 @@ pip install -e .
 
 You can test a whole datacenter:
 ```bash
-python main.py --datacenter ai4eosc-ifca
+python main.py --datacenter ifca-ai4eosc
 ```
 or individual nodes:
 ```bash

@@ -1,17 +1,18 @@
 #TODO: move to proper test package
 
 import logging
+from typing import List
 
 from rich import print
+import typer
 
 from ai4_nomad_tests.nomad_utils import Nomad
 import ai4_nomad_tests.tests as tests
 
 
-#todo: add typer
-def run(
+def main(
     datacenter: str = None,
-    nodes: list = None,
+    nodes: List[str] = None,
     ):
 
     if datacenter:  # test entire datacenter
@@ -84,6 +85,9 @@ def run(
     # # Check the whole cluster
     # print('Testing whole cluster')
     # tests.cluster.consistency()
+
+if __name__ == "__main__":
+    typer.run(main)
 
 
 # run(datacenter='ifca-ai4eosc')
