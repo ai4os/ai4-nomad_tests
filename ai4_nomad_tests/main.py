@@ -60,11 +60,10 @@ def main(
                 tests.node.traefik.node_info(nid)
 
             elif "gpu" in tags:
-                # GPU specific tests
                 tests.node.gpu.node_info(nid)
+                tests.node.cpu.deployment(nid)  # deployment test is same as CPU
 
-            elif "cpu" in tags or "gpu" in tags:
-                # GPU nodes should also be tested as CPU nodes
+            elif "cpu" in tags:
                 tests.node.cpu.node_info(nid)
                 tests.node.cpu.deployment(nid)
 
