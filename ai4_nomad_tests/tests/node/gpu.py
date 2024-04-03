@@ -16,7 +16,7 @@ def node_info(
 
     n = Nomad.node.get_node(node_id)
 
-    assert n['Attributes']['unique.storage.volume'] == '/dev/vdb1', "No volume mounted"
+    assert n['Attributes']['unique.storage.volume'] in ['/dev/vdb1', '/dev/sdb1'], "No volume mounted"
     assert n['ReservedResources']['Memory']['MemoryMB'] >= 4096, "No minimal RAM reserved"
     #todo: check minimal disk per GPU device
 
