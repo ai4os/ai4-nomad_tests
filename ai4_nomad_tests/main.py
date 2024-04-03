@@ -87,12 +87,3 @@ def main(
 
 if __name__ == "__main__":
     typer.run(main)
-
-
-# run(datacenter='ifca-ai4eosc')
-# run(datacenter='ifca-imagine')
-# run(nodes=['node-ifca-traefik'])  # traefik
-# run(nodes=['node-ifca-1'])  # cpu
-# run(nodes=['node-ifca-gpu-0'])  # gpu
-# run(nodes=['node-ifca-imagine-1'])  # cpu
-# run(nodes=['node-ifca-imagine-gpu-0'])  # gpu
