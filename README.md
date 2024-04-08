@@ -39,7 +39,12 @@ python main.py --nodes ifca-node-gpu-1 ifca-node-gpu-2
 ```
 <!-- todo: replace with entrypoint command -->
 
-> Sometimes the test `node.cpu.deployment` fails the first time you run it.
+When a given node will fail to pass the tests, it should be manually marked as
+_ineligible_ to avoid having jobs landing there (and failing).
+Once the admin responsible for that Nomad datacenter fixes the issues, node can be
+marked again as _eligible_.
+
+> ⚠️ Sometimes the test `node.cpu.deployment` fails the first time you run it.
 > This is due to the fact that, the first time you run it, the docker image of module
 > has to be pulled to the node. Although we sleep about 1 min to account for this fact,
 > this is sometimes not enough.
