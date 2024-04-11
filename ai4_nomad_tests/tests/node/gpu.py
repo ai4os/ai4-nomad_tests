@@ -27,3 +27,6 @@ def node_info(
     devices = n['NodeResources']['Devices']
     assert devices, "No (GPU) device detected in node"
     assert [d['Type'] == 'gpu' for d in devices], "Devices detected in node but not GPU"
+
+    # Check if NVIDIA plugin is available
+    assert 'nvidia' in n['Attributes']['driver.docker.runtimes'], "Missing NVIDIA plugin"
