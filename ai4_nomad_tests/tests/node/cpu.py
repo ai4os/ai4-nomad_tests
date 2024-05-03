@@ -33,6 +33,7 @@ def node_info(
 
 def deployment(
         node_id: str,
+        timeout: int = 300,  # 5 mins
         ):
     """
     Make a CPU deployment.
@@ -64,8 +65,8 @@ def deployment(
     nomad_conf = Nomad.jobs.parse(nomad_conf)  # convert template to Nomad conf
     _ = Nomad.jobs.register_job({'Job': nomad_conf})  # submit job
 
-    # Wait a few seconds till the job is deployed
-    time.sleep(60)
+    # Wait some seconds until the allocation is made
+    time.sleep(5)
 
     # Reorder allocations based on recency
     allocs = Nomad.job.get_allocations('nomad-tests-cpu')
@@ -75,6 +76,21 @@ def deployment(
         key=lambda pair: pair[0],
         )][::-1]  # more recent first
     a = allocs[0]
+
+    # Check allocation status every 5 seconds until timeout
+    deployed = False
+    check_freq = 5
+    for _ in range(timeout // check_freq):
+        a = Nomad.allocation.get_allocation(a['ID'])
+        if a['ClientStatus'] == 'running':
+            deployed = True
+            break
+        time.sleep(check_freq)
+
+    if not deployed:
+        raise Exception(
+            f"Timeout: The job has not been successfully after {timeout} seconds."
+            )
 
     # Check status is running
     assert a['ClientStatus'] == 'running'
