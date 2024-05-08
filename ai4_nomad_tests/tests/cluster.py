@@ -4,7 +4,6 @@ Tests whole cluster consistency.
 from rich import print
 
 from ai4_nomad_tests.nomad_utils import Nomad
-from ai4_nomad_tests.tests.node import common
 
 
 def consistency():
@@ -15,9 +14,8 @@ def consistency():
     pairs = set()
     for node in Nomad.nodes.get_nodes():
         node = Nomad.node.get_node(node['ID'])
-        common.node_info(node['ID'])
         pairs.add(
-            (node['Datacenter'], node['Meta']['domain'])
+            (node['Datacenter'], node['Meta'].get('domain', None))
         )
 
     datacenters = {i[0] for i in pairs}
