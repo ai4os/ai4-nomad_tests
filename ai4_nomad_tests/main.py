@@ -11,13 +11,20 @@ import ai4_nomad_tests.tests as tests
 
 
 def main(
-    datacenter: str = None,
-    nodes: List[str] = None,
+    cluster: bool = False,  # tests the whole cluster
+    datacenter: str = None,  # tests a single datacenter
+    nodes: List[str] = None,  # test a list of nodes
     ):
+
+    if not any([cluster, datacenter, nodes]):
+        raise Exception(
+            "You must either test the whole cluster, a single datacenter or a list " \
+            "of nodes."
+        )
 
     if datacenter:  # test entire datacenter
 
-        print(f'Testing datacenter: [yellow bold]{datacenter}[/yellow bold]')
+        print(f"Testing datacenter: [yellow bold]{datacenter}[/yellow bold]")
 
         # Parse nodes belonging to datacenter
         nodes, node_ids, datacenters = [], [], set()
@@ -35,10 +42,19 @@ def main(
         # Run datacenter specific checks
         tests.datacenter.consistency(node_ids)
 
-        print('\n:green_circle: [green bold]All tests successfully passed![/green bold] :green_circle: \n')
+        print(
+            "\n:green_circle: [green bold]All tests successfully passed!" \
+            "[/green bold] :green_circle: \n"
+            )
 
     # Test nodes nodes individually
     name2id = {n['Name']: n['ID'] for n in Nomad.nodes.get_nodes()}
+
+    # If testing the whole cluster, select all nodes
+    if cluster:
+        print("Testing whole cluster")
+        tests.cluster.consistency()
+        nodes = list(name2id.keys())
 
     # Check node_name input is correct
     name_test = [i in name2id.keys() for i in nodes]
@@ -74,16 +90,17 @@ def main(
                     "- Supported tags: [cpu, gpu, traefik]"
                     )
 
-            print('\n:green_circle: [green bold]All tests successfully passed![/green bold] :green_circle: \n')
+            print(
+                "\n:green_circle: [green bold]All tests successfully passed!" \
+                "[/green bold] :green_circle: \n"
+                )
 
         except AssertionError:
             logging.error("Assertion error:", exc_info=True)
-            print('\n:red_circle: [red bold]Some tests failed![/red bold] :red_circle: \n')
+            print(
+                "\n:red_circle: [red bold]Some tests failed![/red bold] :red_circle: \n"
+                )
 
-    #todo: reenable
-    # # Check the whole cluster
-    # print('Testing whole cluster')
-    # tests.cluster.consistency()
 
 if __name__ == "__main__":
     typer.run(main)
