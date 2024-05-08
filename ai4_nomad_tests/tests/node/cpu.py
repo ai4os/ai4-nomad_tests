@@ -47,6 +47,21 @@ def deployment(
 
     n = Nomad.node.get_node(node_id)
 
+    # Assert node is eligible (might have been marked as ineligible by some previous
+    # test failure)
+    if n['SchedulingEligibility'] == 'ineligible':
+        # We could mark the node eligible here, but for the moment let's keep this step
+        # manual
+        raise Exception(
+            "The node status is ineligible, so `tests.cpu.deployment()` cannot be ran" \
+            ". The node might have been automatically flagged as ineligible due to "  \
+            "some previous tests failing to successfully run there. This is done to "  \
+            "avoid new user deployments landing in a failing node. " \
+            "If your tests have ran successfully up to this point and you want to "  \
+            "run these final `tests.cpu.deployment()`, please mark the node as " \
+            "`eligible` in the Nomad UI and run the tests again."
+        )
+
     # Retrieve supported domains
     namespaces = ['ai4eosc', 'imagine', 'tutorials']
     namespaces[:] = [i for i in namespaces if i in n['Meta']['namespace']]

@@ -14,6 +14,7 @@ def main(
     cluster: bool = False,  # tests the whole cluster
     datacenter: str = None,  # tests a single datacenter
     nodes: List[str] = None,  # test a list of nodes
+    mark_ineligible: bool = False,  # mark node as ineligible if fails to pass
     ):
 
     if not any([cluster, datacenter, nodes]):
@@ -47,7 +48,7 @@ def main(
             "[/green bold] :green_circle: \n"
             )
 
-    # Test nodes nodes individually
+    # Map names to node IDs
     name2id = {n['Name']: n['ID'] for n in Nomad.nodes.get_nodes()}
 
     # If testing the whole cluster, select all nodes
@@ -100,6 +101,11 @@ def main(
             print(
                 "\n:red_circle: [red bold]Some tests failed![/red bold] :red_circle: \n"
                 )
+
+            # Mark node as ineligible
+            if mark_ineligible:
+                print("Marking node as ineligible.")
+                Nomad.node.eligible_node(nid, ineligible=True)
 
 
 if __name__ == "__main__":
