@@ -4,7 +4,7 @@ Test a CPU node
 
 from copy import deepcopy
 import time
-import warnings
+import uuid
 
 import requests
 from rich import print
@@ -45,6 +45,12 @@ def deployment(
     """
     print('  Running test: [hot_pink3 bold]node.cpu.deployment[/hot_pink3 bold]')
 
+    # Before running anything make sure to purge old tests jobs
+    Nomad.job.deregister_job(
+        id_='nomad-tests-cpu',
+        purge=True,
+        )
+
     n = Nomad.node.get_node(node_id)
 
     # Assert node is eligible (might have been marked as ineligible by some previous
@@ -67,18 +73,27 @@ def deployment(
     namespaces[:] = [i for i in namespaces if i in n['Meta']['namespace']]
     domains = [f"{n['Meta']['domain']}-{DOMAINS[i]}" for i in namespaces]
 
-    # Launch job
+    # Configure job
     nomad_conf = deepcopy(NOMAD_JOBS['cpu'])
+    test_uuid =  str(uuid.uuid1())[:8]
     nomad_conf = nomad_conf.safe_substitute(  # replace the Nomad job template
         {
             'NODE_ID': node_id,
+            'UUID': test_uuid,
             'DOMAIN_0': domains[0] if len(domains) > 0 else '',
             'DOMAIN_1': domains[1] if len(domains) > 1 else '',
             'DOMAIN_2': domains[2] if len(domains) > 2 else '',
         }
     )
     nomad_conf = Nomad.jobs.parse(nomad_conf)  # convert template to Nomad conf
-    _ = Nomad.jobs.register_job({'Job': nomad_conf})  # submit job
+
+    # Remove unneeded services (cosmetic)
+    services = nomad_conf['TaskGroups'][0]['Services']
+    services = services[:len(domains)]
+    nomad_conf['TaskGroups'][0]['Services'] = services
+
+    # Submit job
+    _ = Nomad.jobs.register_job({'Job': nomad_conf})
 
     # Wait some seconds until the allocation is made
     time.sleep(5)
@@ -110,11 +125,14 @@ def deployment(
     # Check status is running
     assert a['ClientStatus'] == 'running'
 
+    # Wait some seconds until deepaas is deployed
+    time.sleep(10)
+
     # Check deepaas is accessible
-    for domain in domains:
+    for i, domain in enumerate(domains):
         print(f'  [grey50]Testing domain: [bold]{domain}[/bold][/grey50]')
 
-        url = f'https://api-nomad-tests-cpu.{domain}'
+        url = f'https://api{i}-nomad-tests-cpu-{test_uuid}.{domain}'
         r = requests.get(url)
         assert r.status_code == 200, \
             "DEEPaaS API not accessible. Please check: \n" \
