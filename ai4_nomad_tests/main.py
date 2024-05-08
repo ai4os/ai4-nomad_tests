@@ -2,6 +2,7 @@
 
 import logging
 from typing import List
+from time import time
 
 from rich import print
 import typer
@@ -16,6 +17,8 @@ def main(
     nodes: List[str] = None,  # test a list of nodes
     mark_ineligible: bool = False,  # mark node as ineligible if fails to pass
     ):
+
+    t0 = time()
 
     if not any([cluster, datacenter, nodes]):
         raise Exception(
@@ -106,6 +109,9 @@ def main(
             if mark_ineligible:
                 print("Marking node as ineligible.")
                 Nomad.node.eligible_node(nid, ineligible=True)
+
+    t1 = time()
+    print(f"Tests duration: {t1-t0:.1f} seconds")
 
 
 if __name__ == "__main__":
