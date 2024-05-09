@@ -33,7 +33,8 @@ def node_info(
 
 def deployment(
         node_id: str,
-        timeout: int = 300,  # 5 mins
+        timeout_nomad: int = 300,  # timeout for deploying Nomad job (5 mins)
+        timeout_deepaas: int = 60,  # timeout for running deepaas (1 mins)
         ):
     """
     Make a CPU deployment.
@@ -110,7 +111,7 @@ def deployment(
     # Check allocation status every 5 seconds until timeout
     deployed = False
     check_freq = 5
-    for _ in range(timeout // check_freq):
+    for _ in range(timeout_nomad // check_freq):
         a = Nomad.allocation.get_allocation(a['ID'])
         if a['ClientStatus'] == 'running':
             deployed = True
@@ -119,27 +120,33 @@ def deployment(
 
     if not deployed:
         raise Exception(
-            f"Timeout: The job has not been successfully after {timeout} seconds."
+            "Timeout: The job has *not* been successfully deployed after "\
+            f"{timeout_nomad} seconds timeout."
             )
 
     # Check status is running
     assert a['ClientStatus'] == 'running'
 
-    # Wait some seconds until deepaas is deployed
-    time.sleep(10)
-
-    # Check deepaas is accessible
+    # Check deepaas is accessible every 5 seconds until timeout
     for i, domain in enumerate(domains):
         print(f'  [grey50]Testing domain: [bold]{domain}[/bold][/grey50]')
 
         url = f'https://api{i}-nomad-tests-cpu-{test_uuid}.{domain}'
-        r = requests.get(url)
-        assert r.status_code == 200, \
-            "DEEPaaS API not accessible. Please check: \n" \
-            "1. you have a running Traefik job \n" \
-            "2. you have properly set up the security groups in Openstack \n" \
-            f"3. you have created SSL certs for *.{domain} \n" \
-            "4. you have copied the SSL certs in your Traefik job \n"
+        for _ in range(timeout_deepaas // check_freq):
+            r = requests.get(url)
+            if r.status_code == 200:
+                break
+            time.sleep(check_freq)
+
+        if r.status_code != 200:
+            raise Exception(
+                f"DEEPaaS API not accessible after {timeout_deepaas} seconds timeout. " \
+                "Please check: \n" \
+                "1. you have a running Traefik job \n" \
+                "2. you have properly set up the security groups in Openstack \n" \
+                f"3. you have created SSL certs for *.{domain} \n" \
+                "4. you have copied the SSL certs in your Traefik job \n"
+            )
 
     # Delete job
     Nomad.job.deregister_job(
