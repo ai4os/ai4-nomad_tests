@@ -32,33 +32,30 @@ deactivate
 ```
 
 ## Usage
-<!-- #TODO: add entrypoints -->
 
 You can test:
 
 * the whole cluster:
   ```bash
-  python main.py --cluster
+  ai4-nomad-tests --cluster
   ```
 
 * a single datacenter:
   ```bash
-  python main.py --datacenter ifca-ai4eosc
+  ai4-nomad-tests --datacenter ifca-ai4eosc
   ```
 
 * a list of individual nodes:
   ```bash
-  python main.py --nodes ifca-node-gpu-1 ifca-node-gpu-2
+  ai4-nomad-tests --nodes ifca-node-gpu-1 --nodes ifca-node-gpu-2
   ```
 
-You can schedule a cronjob that executes periodically the tests in the whole cluster
-and automatically mark the nodes that fail to pass the tests as _ineligible_, to avoid
-having jobs landing there (and failing).
-
-```bash
-# crontab -e
-0 0 * * * python /path/to/main.py --cluster --mark-ineligible
-```
-
-Once the admin responsible for that Nomad nodes fixes the issues, node can be
-marked again as _eligible_ in the Nomad UI.
+> 💡 **Tip**: Periodic testing
+>
+> You can schedule a cronjob that executes periodically the tests in the whole cluster
+> and automatically mark the nodes that fail to pass the tests as _ineligible_, to avoid
+> having jobs landing there (and failing). For this use the
+> [`monitoring-cluster.sh`](./monitor-cluster.sh) script.
+>
+> Once the admin responsible for that Nomad nodes fixes the issues, node can be
+> manually marked again as _eligible_ in the Nomad UI.

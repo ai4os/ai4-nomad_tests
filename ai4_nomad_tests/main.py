@@ -1,4 +1,4 @@
-#TODO: move to proper test package
+#TODO: move to proper test package?
 
 import logging
 from typing import List
@@ -11,6 +11,10 @@ from ai4_nomad_tests.nomad_utils import Nomad
 import ai4_nomad_tests.tests as tests
 
 
+app = typer.Typer()
+
+
+@app.command()
 def main(
     cluster: bool = False,  # tests the whole cluster
     datacenter: str = None,  # tests a single datacenter
@@ -112,7 +116,3 @@ def main(
 
     t1 = time()
     print(f"Tests duration: {t1-t0:.1f} seconds")
-
-
-if __name__ == "__main__":
-    typer.run(main)

@@ -3,7 +3,7 @@ Common test to all nodes
 """
 from rich import print
 
-from nomad_utils import Nomad
+from ai4_nomad_tests.nomad_utils import Nomad
 
 
 def node_info(
