@@ -13,6 +13,9 @@ from ai4_nomad_tests.conf import DOMAINS, NOMAD_JOBS
 from ai4_nomad_tests.nomad_utils import Nomad
 
 
+session = requests.Session()
+
+
 def node_info(
         node_id: str,
         ):
@@ -133,7 +136,7 @@ def deployment(
 
         url = f'https://api{i}-nomad-tests-cpu-{test_uuid}.{domain}'
         for _ in range(timeout_deepaas // check_freq):
-            r = requests.get(url)
+            r = session.get(url)
             if r.status_code == 200:
                 break
             time.sleep(check_freq)
