@@ -59,3 +59,15 @@ You can test:
 >
 > Once the admin responsible for that Nomad nodes fixes the issues, node can be
 > manually marked again as _eligible_ in the Nomad UI.
+
+## Implementation notes
+
+* GPU deployment testing is using a Nomad job that doesn't ask for GPUs. This Nomad job
+  is mainly intended to check that the Traefik endpoints of that node work fine.
+  We don't test with a GPU job because GPUs are a scarce resource so the deployment
+  could fail because no GPUs are available, not because malfunctioning.
+
+  To find any GPU misconfigurations without actually making a GPU deployment, we try
+  to catch as many error as possible parsing the node metadata (cf.
+  [`gpu.node_info()`](./ai4_nomad_tests/tests/node/gpu.py)).
+  This is not perfect but it catches most GPU errors (eg. device not available).
