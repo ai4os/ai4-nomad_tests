@@ -1,6 +1,7 @@
 """
 Miscellaneous Nomad patches
 """
+import subprocess
 import types
 from typing import Union
 
@@ -133,3 +134,23 @@ Nomad.job.get_evaluations = types.MethodType(
     get_allocations,
     Nomad.job
 )
+
+
+def update_node_metadata(
+    node_id: str,
+    metadata_key: str,
+    metadata_value: str,
+    ):
+    """
+    Update a Nomad node metadata from CLI (not available in the Nomad Python client)
+    """
+    try:
+        subprocess.run(
+            f"nomad node meta apply -node-id {node_id} {metadata_key}={metadata_value}",
+            shell=True,
+            )
+    except Exception:
+        raise Exception(
+            "Failed to update the node's metadata. ",
+            "Make sure your Nomad client version is >= 1.5.",
+        )

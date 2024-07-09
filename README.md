@@ -15,6 +15,9 @@ The tests are useful for checking:
 
 * You need to have the [appropriate certs](https://github.com/ai4os/ai4-papi#installation)
   to connect to the Nomad cluster
+
+  You need a nomad version >= 1.5, to support the [node meta](https://developer.hashicorp.com/nomad/docs/commands/node/meta) command.
+
 * Before being able to run the tests you should provide an EGI token:
   ```bash
   export TMP_EGI_TOKEN="$(oidc-token egi-checkin)"

@@ -7,7 +7,7 @@ from time import time
 from rich import print
 import typer
 
-from ai4_nomad_tests.nomad_utils import Nomad
+from ai4_nomad_tests.nomad_utils import Nomad, update_node_metadata
 import ai4_nomad_tests.tests as tests
 
 
@@ -109,10 +109,17 @@ def main(
                 "\n:red_circle: [red bold]Some tests failed![/red bold] :red_circle: \n"
                 )
 
-            # Mark node as ineligible
+            # Mark node as ineligible (we might not want it to mark as ineligible
+            # because we might need to run test jobs in the node to fix it)
             if mark_ineligible:
                 print("Marking node as ineligible.")
                 Nomad.node.eligible_node(nid, ineligible=True)
+
+            # Set the node status as "error"
+            update_node_metadata(nid, 'status', 'error')
+
+        # Set the node status as "ready"
+        update_node_metadata(nid, 'status', 'ready')
 
     t1 = time()
     print(f"Tests duration: {t1-t0:.1f} seconds")
