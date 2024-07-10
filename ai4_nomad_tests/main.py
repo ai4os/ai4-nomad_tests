@@ -103,8 +103,8 @@ def main(
                 "[/green bold] :green_circle: \n"
                 )
 
-        except AssertionError:
-            logging.error("Assertion error:", exc_info=True)
+        except Exception:
+            logging.error("Error:", exc_info=True)
             print(
                 "\n:red_circle: [red bold]Some tests failed![/red bold] :red_circle: \n"
                 )
