@@ -103,6 +103,9 @@ def main(
                 "[/green bold] :green_circle: \n"
                 )
 
+            # Set the node status as "ready"
+            update_node_metadata(nid, 'status', 'ready')
+
         except Exception:
             logging.error("Error:", exc_info=True)
             print(
@@ -117,9 +120,6 @@ def main(
 
             # Set the node status as "error"
             update_node_metadata(nid, 'status', 'error')
-
-        # Set the node status as "ready"
-        update_node_metadata(nid, 'status', 'ready')
 
     t1 = time()
     print(f"Tests duration: {t1-t0:.1f} seconds")
