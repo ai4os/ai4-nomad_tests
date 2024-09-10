@@ -143,7 +143,8 @@ def deployment(
 
         if r.status_code != 200:
             raise Exception(
-                f"DEEPaaS API not accessible after {timeout_deepaas} seconds timeout. " \
+                f"DEEPaaS API not accessible after a {timeout_deepaas} seconds timeout. \n" \
+                f"    {url} \n" \
                 "Please check: \n" \
                 "1. you have a running Traefik job \n" \
                 "2. you have properly set up the security groups in Openstack \n" \
