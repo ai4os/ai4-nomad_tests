@@ -67,10 +67,7 @@ job "nomad-tests-cpu" {
       driver = "docker"
 
       config {
-        # We use a tag that is not latest because otherwise the image gets pulled always
-        # ref: https://github.com/hashicorp/nomad/issues/20548
-        // image   = "deephdc/deep-oc-demo_app:latest"
-        image   = "ignacioheredia/demo_app:with_files"
+        image   = "ai4oshub/ai4os-demo-app:latest"
         command = "deep-start"
         args    = ["--deepaas"]
         ports   = ["api"]
