@@ -28,10 +28,16 @@ def node_info(
     assert n['ReservedResources']['Memory']['MemoryMB'] >= 4096, "No minimal RAM reserved"
     disk_GB = int(n['Attributes']['unique.storage.bytesfree']) / 10**9
     cpu_cores = int(n['Attributes']['cpu.reservablecores'])
-    assert disk_GB / cpu_cores > 5, "Node should have at least 5 GB disk per CPU core"
 
-    # Check node metadata
-    assert n['Meta']['compute'] == 'true'
+    if n['Meta']['compute'] == 'true':
+        assert disk_GB / cpu_cores > 5, "Node should have at least 5 GB disk per CPU core"
+
+    elif n['Meta']['compute'] == 'false':
+        assert 'tryme' in n['Meta']['tags']
+        assert disk_GB > 200, "Not enough disk in tryme node"
+
+    else:
+        raise(f"Invalid metadata `compute` value: {n['Meta']['compute']}")
 
 
 def deployment(

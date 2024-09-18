@@ -87,7 +87,7 @@ def main(
                 tests.node.gpu.node_info(nid)
                 tests.node.cpu.deployment(nid)  # deployment test is same as CPU
 
-            elif "cpu" in tags:
+            elif ("cpu" in tags) or ("tryme" in tags):
                 tests.node.cpu.node_info(nid)
                 tests.node.cpu.deployment(nid)
 
@@ -95,7 +95,7 @@ def main(
                 raise Exception(
                     "Invalid node type: \n" \
                     f"- Node tags: {tags} \n" \
-                    "- Supported tags: [cpu, gpu, traefik]"
+                    "- Supported tags: [cpu, gpu, traefik, tryme]"
                     )
 
             print(
