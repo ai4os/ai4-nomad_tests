@@ -20,6 +20,7 @@ def main(
     datacenter: str = None,  # tests a single datacenter
     nodes: List[str] = None,  # test a list of nodes
     mark_ineligible: bool = False,  # mark node as ineligible if fails to pass
+    dry_run: bool = False,  # run without affecting the node status
     ):
 
     t0 = time()
@@ -103,8 +104,10 @@ def main(
                 "[/green bold] :green_circle: \n"
                 )
 
-            # Set the node status as "ready"
-            update_node_metadata(nid, 'status', 'ready')
+            if not dry_run:
+                # Set the node status as "ready"
+                print("Setting node status to `ready`")
+                update_node_metadata(nid, 'status', 'ready')
 
         except Exception:
             logging.error("Error:", exc_info=True)
@@ -112,14 +115,16 @@ def main(
                 "\n:red_circle: [red bold]Some tests failed![/red bold] :red_circle: \n"
                 )
 
-            # Mark node as ineligible (we might not want it to mark as ineligible
-            # because we might need to run test jobs in the node to fix it)
-            if mark_ineligible:
-                print("Marking node as ineligible.")
-                Nomad.node.eligible_node(nid, ineligible=True)
+            if not dry_run:
+                # Mark node as ineligible (we might not want it to mark as ineligible
+                # because we might need to run test jobs in the node to fix it)
+                if mark_ineligible:
+                    print("Marking node as ineligible.")
+                    Nomad.node.eligible_node(nid, ineligible=True)
 
-            # Set the node status as "error"
-            update_node_metadata(nid, 'status', 'error')
+                # Set the node status as "error"
+                print("Setting node status to `error`")
+                update_node_metadata(nid, 'status', 'error')
 
     t1 = time()
     print(f"Tests duration: {t1-t0:.1f} seconds")
