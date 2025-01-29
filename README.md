@@ -16,23 +16,16 @@ The tests are useful for checking:
 * You need to have the [appropriate certs](https://github.com/ai4os/ai4-papi#installation)
   to connect to the Nomad cluster
 
-  You need a nomad version >= 1.5, to support the [node meta](https://developer.hashicorp.com/nomad/docs/commands/node/meta) command.
+* [Install Nomad](https://developer.hashicorp.com/nomad/docs/install) (this is needed to be able to update the node metadata, which is not supported in the `python-nomad` package)
 
-* Before being able to run the tests you should provide an EGI token:
+* Install the Python package:
+
   ```bash
-  export TMP_EGI_TOKEN="$(oidc-token egi-checkin)"
+  python3 -m venv --system-site-packages myenv
+  source myenv/bin/activate
+  pip install -e .
+  deactivate
   ```
-  See [PAPI docs](https://github.com/ai4os/ai4-papi#generating-a-valid-refresh-token)
-  in order know how to generate an EGI token.
-
-
-Once this is ready, you can install the tests suite with:
-```bash
-python -m venv --system-site-packages myenv
-source myenv/bin/activate
-pip install -e .
-deactivate
-```
 
 ## Usage
 
