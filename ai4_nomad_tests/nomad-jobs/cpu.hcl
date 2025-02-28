@@ -77,7 +77,7 @@ job "nomad-tests-cpu" {
       }
 
       resources {
-        cores  = 1
+        cpu    = 500
         memory = 500
       }
     }
