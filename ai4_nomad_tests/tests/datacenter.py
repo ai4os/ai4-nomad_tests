@@ -16,9 +16,6 @@ def consistency(
     for nid in node_ids:
         n = Nomad.node.get_node(nid)
 
-        # Check basic node info
-        common.node_info(nid)
-
         # Add info for extra checks
         domains.add(n['Datacenter'])
         traefik.append(
