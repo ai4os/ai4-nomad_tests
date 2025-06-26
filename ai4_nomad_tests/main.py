@@ -47,12 +47,23 @@ def main(
         )
 
         # Run datacenter specific checks
-        tests.datacenter.consistency(node_ids)
-
-        print(
-            "\n:green_circle: [green bold]All tests successfully passed!"
-            "[/green bold] :green_circle: \n"
-        )
+        try:
+            tests.datacenter.consistency(node_ids)
+            print(
+                "\n:green_circle: [green bold]All tests successfully passed!"
+                "[/green bold] :green_circle: \n"
+            )
+        except Exception:
+            logging.error("Error:", exc_info=True)
+            print(
+                "\n:red_circle: [red bold]Some tests failed![/red bold] :red_circle: \n"
+            )
+            # If the datacenter is not consistent, all nodes should be marked as non
+            # eligible
+            for nid in node_ids:
+                if not dry_run:
+                    print("Marking node as ineligible.")
+                    Nomad.node.eligible_node(nid, ineligible=True)
 
     # Map names to node IDs
     name2id = {n["Name"]: n["ID"] for n in Nomad.nodes.get_nodes()}

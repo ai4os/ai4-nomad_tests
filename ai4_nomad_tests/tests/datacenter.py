@@ -21,7 +21,7 @@ def consistency(
 
         # Add info for extra checks
         domains.add(n["Datacenter"])
-        ntypes.append(n["Meta"]["type"])
+        ntypes.append(n["Meta"].get("type", None))
 
     # Check all nodes in datacenter have same domain
     assert len(domains) == 1, (
