@@ -1,5 +1,6 @@
 # TODO: move to proper test package?
 
+from datetime import datetime
 import logging
 from typing import List
 from time import time
@@ -136,6 +137,10 @@ def main(
                 # Set the node status as "error"
                 print("Setting node status to `error`")
                 update_node_metadata(nid, "status", "error")
+
+        # Add to the metadata when were the tests run
+        now = datetime.now().isoformat()
+        update_node_metadata(nid, "last_tested", now)
 
     t1 = time()
     print(f"Tests duration: {t1 - t0:.1f} seconds")
