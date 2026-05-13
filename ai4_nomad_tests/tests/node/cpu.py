@@ -149,7 +149,14 @@ def deployment(
 
         url = f"https://api{i}-nomad-tests-cpu-{test_uuid}.{domain}"
         for _ in range(timeout_deepaas // check_freq):
-            r = session.get(url)
+            try:
+                r = session.get(url)
+            except requests.ConnectionError:
+                raise Exception(
+                    f"Fail to establish a connection with {url}.\n"
+                    "Check if the Traefik job is running.")
+            except Exception as e:
+                raise e
             if r.status_code == 200:
                 break
             time.sleep(check_freq)
