@@ -107,13 +107,32 @@ def deployment(
     nomad_conf["TaskGroups"][0]["Services"] = services
 
     # Submit job
-    _ = Nomad.jobs.register_job({"Job": nomad_conf})
+    job_response = Nomad.jobs.register_job({"Job": nomad_conf})
 
     # Wait some seconds until the allocation is made
     time.sleep(5)
+    allocs = Nomad.job.get_allocations("nomad-tests-cpu")
+
+    # If no allocation are made there is probably something wrong with the node.
+    # It's certainly not because there are not enough resources because the test job
+    # barely consumes resources
+    if not allocs:
+        eval_id = job_response.get("EvalID")
+        reason_msg = "No specific placement failures logged."
+        eval_data = Nomad.evaluation.get_evaluation(eval_id)
+        failed_allocs = eval_data.get("FailedTGAllocs", {})
+        unmet_constraints = failed_allocs.get("usergroup", {}).get("ConstraintFiltered", {})
+        if failed_allocs:
+            reason_msg = str(unmet_constraints)
+
+        raise Exception(
+            "Job was launched but no allocation could be made, so the job remained "
+            "queued, probably due to a misconfiguration in the node.\n"
+            "The placement failure returned the following unmet constraints:\n"
+            f"{reason_msg}\n\n"
+        )
 
     # Reorder allocations based on recency
-    allocs = Nomad.job.get_allocations("nomad-tests-cpu")
     dates = [a["CreateTime"] for a in allocs]
     allocs = [
         x
