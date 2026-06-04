@@ -184,11 +184,12 @@ def deployment(
             raise Exception(
                 f"DEEPaaS API not accessible after a {timeout_deepaas} seconds timeout. \n"
                 f"    {url} \n"
-                "Please check: \n"
-                "1. you have a running Traefik job \n"
-                "2. you have properly set up the security groups in Openstack \n"
-                f"3. you have created SSL certs for *.{domain} \n"
-                "4. you have copied the SSL certs in your Traefik job \n"
+                "Possible issues: \n"
+                "* Consul might be misbehaving (e.g. ACL validation might fail due to network interruptions). Try to restart Consul. \n"
+                "* The datacenter's Traefik job is not running  \n"
+                "* Openstack security groups are not correctly configured \n"
+                f"* SSL certs are not created for *.{domain} \n"
+                "* SSL certs are not copied into the Traefik job \n"
             )
 
     # Delete job
