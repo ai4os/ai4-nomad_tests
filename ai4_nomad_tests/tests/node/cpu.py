@@ -73,13 +73,11 @@ def deployment(
         # We could mark the node eligible here, but for the moment let's keep this step
         # manual
         raise Exception(
-            "The node status is ineligible, so `tests.cpu.deployment()` cannot be ran"
-            ". The node might have been automatically flagged as ineligible due to "
-            "some previous tests failing to successfully run there. This is done to "
-            "avoid new user deployments landing in a failing node. "
-            "If your tests have ran successfully up to this point and you want to "
-            "run these final `tests.cpu.deployment()`, please mark the node as "
-            "`eligible` in the Nomad UI and run the tests again."
+            "The node status is ineligible, so `tests.cpu.deployment()` cannot be ran. "
+            "The node might have been marked ineligible by a Nomad admin because "
+            "maintenance in that node is needed for some reason (e.g. patches need to be "
+            "applied). If you are the admin of this node and maintenance as already "
+            "been performed, feel free to mark the node as eligible again in the Nomad UI."
         )
 
     # Retrieve supported domains
