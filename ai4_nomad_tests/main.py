@@ -1,7 +1,9 @@
 # TODO: move to proper test package?
 
 from datetime import datetime
+import io
 import logging
+import sys
 from typing import List
 from time import time
 
@@ -9,6 +11,7 @@ from rich import print
 import typer
 
 from ai4_nomad_tests.nomad_utils import Nomad, update_node_metadata
+from ai4_nomad_tests.utils import send_logs_to_loki, TeeLogger
 import ai4_nomad_tests.tests as tests
 
 
@@ -84,12 +87,25 @@ def main(
     )
 
     for node in nodes:
+
+        # Capture logs to send to Loki
+        log_capture = io.StringIO()
+        original_stdout = sys.stdout
+        original_stderr = sys.stderr
+        sys.stdout = TeeLogger(original_stdout, log_capture)
+        sys.stderr = TeeLogger(original_stderr, log_capture)
+
+        status_label = "success"
+        datacenter_label = "unknown"
+
         try:
             print(f"Testing node: [yellow bold]{node}[/yellow bold]")
 
             nid = name2id[node]
-            tests.node.common.node_info(nid)
             n = Nomad.node.get_node(nid)
+            datacenter_label = n.get("Datacenter", "unknown")
+
+            tests.node.common.node_info(nid)
             tags = n["Meta"]["tags"]
             ntype = n["Meta"]["type"]
 
@@ -121,8 +137,9 @@ def main(
                 print("Setting node status to `ready`")
                 update_node_metadata(nid, "status", "ready")
 
-        except Exception:
-            logging.error("Error:", exc_info=True)
+        except Exception as e:
+            status_label = "failed"
+            print(e)
             print(
                 "\n:red_circle: [red bold]Some tests failed![/red bold] :red_circle: \n"
             )
@@ -137,6 +154,14 @@ def main(
                 # Set the node status as "error"
                 print("Setting node status to `error`")
                 update_node_metadata(nid, "status", "error")
+
+        finally:
+            # Restore stdout and stderr to prevent memory leaks
+            sys.stdout = original_stdout
+            sys.stderr = original_stderr
+
+            # Send captured logs to Loki
+            send_logs_to_loki(log_capture.getvalue(), node, datacenter_label, status_label)
 
         # Add to the metadata when were the tests run
         now = datetime.now().isoformat()

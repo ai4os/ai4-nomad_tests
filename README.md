@@ -27,6 +27,13 @@ The tests are useful for checking:
   deactivate
   ```
 
+  * If you want to send the logs to the AI4EOSC Loki instance, you need to define the following variables (in a `.env` file):
+
+  ```bash
+  LOKI_USER=test-name
+  LOKI_PASSWORD=test-password
+  ```
+
 ## Usage
 
 You can test:
