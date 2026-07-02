@@ -17,6 +17,10 @@ def update_node_metadata(
 ):
     """
     Update a Nomad node metadata from CLI (not available in the Nomad Python client)
+
+    TODO: use the python nomad client when this PR is merged:
+    https://github.com/jrxFive/python-nomad/pull/181
+    --> r = Nomad.client.metadata.update_metadata("2c73d84b-305c-d0b6-5477-57be1cf1bff5", {"status": "error"})
     """
     try:
         s = subprocess.run(
