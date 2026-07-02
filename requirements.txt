@@ -1,4 +1,4 @@
-python-nomad == 2.0.0
+python-nomad == 2.1.0
 requests
 rich
 typer
