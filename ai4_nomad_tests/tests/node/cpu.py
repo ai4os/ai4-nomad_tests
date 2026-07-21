@@ -11,6 +11,7 @@ from rich import print
 
 from ai4_nomad_tests.conf import DOMAINS, NOMAD_JOBS
 from ai4_nomad_tests.nomad_utils import Nomad
+from ai4_nomad_tests.utils import get_ssl_expiry
 
 
 session = requests.Session()
@@ -168,10 +169,18 @@ def deployment(
         for _ in range(timeout_deepaas // check_freq):
             try:
                 r = session.get(url)
-            except requests.ConnectionError:
+            except requests.exceptions.SSLError as e:
                 raise Exception(
-                    f"Fail to establish a connection with {url}.\n"
-                    "Check if the Traefik job is running.")
+                    f"SSL Error: Invalid SSL certificates:\n"
+                    f"*   --> certificates expire on: {get_ssl_expiry(url)}.\n"
+                    f"{e}"
+                    )
+            except requests.ConnectionError as e:
+                raise Exception(
+                    f"Failed to establish a connection with {url}:\n"
+                    "* Check if the Traefik job is running.\n"
+                    f"{e}"
+                    )
             except Exception as e:
                 raise e
             if r.status_code == 200:

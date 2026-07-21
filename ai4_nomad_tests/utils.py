@@ -1,5 +1,11 @@
+from datetime import datetime, timezone
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
 import os
+import ssl
+import socket
 import time
+from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 from pathlib import Path
@@ -88,3 +94,22 @@ def send_logs_to_loki(logs: str, node: str, datacenter: str, status: str):
             print("Logs successfully sent to Loki.")
     except Exception as e:
         print(f"Error while sending logs to Loki: {e}")
+
+
+def get_ssl_expiry(url, port=443):
+    # Extract hostname from URL
+    parsed = urlparse(url)
+    hostname = parsed.hostname
+    if hostname is None:
+        raise ValueError(f"Could not extract hostname from URL: {url!r}")
+
+    # Retrieve cert expiry date
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+
+    with socket.create_connection((hostname, port), timeout=5) as sock:
+        with context.wrap_socket(sock, server_hostname=hostname) as ssock:
+            der_cert = ssock.getpeercert(binary_form=True)
+            cert = x509.load_der_x509_certificate(der_cert, default_backend())
+            return cert.not_valid_after_utc
