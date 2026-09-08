@@ -32,6 +32,7 @@ The tests are useful for checking:
   ```bash
   LOKI_USER=test-name
   LOKI_PASSWORD=test-password
+  LOKI_ORG_ID=test-org  # Optional
   ```
 
 ## Usage

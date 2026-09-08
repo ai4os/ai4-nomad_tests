@@ -46,9 +46,10 @@ def send_logs_to_loki(logs: str, node: str, datacenter: str, status: str):
     :param status: The status label (e.g., 'success', 'failed').
     """
     # Load environment variables
-    loki_url = os.getenv("LOKI_URL", "https://loki.cloud.ai4eosc.eu/loki/api/v1/push")
+    loki_url = os.getenv("LOKI_URL", "https://loki.k8s.cloud.ai4eosc.eu/loki/api/v1/push")
     loki_user = os.getenv("LOKI_USER")
     loki_password = os.getenv("LOKI_PASSWORD")
+    loki_org_id = os.getenv("LOKI_ORG_ID", "default")
 
     if not loki_user or not loki_password:
         print("LOKI_USER or LOKI_PASSWORD environment variables are not set. Cannot send logs.")
@@ -80,12 +81,16 @@ def send_logs_to_loki(logs: str, node: str, datacenter: str, status: str):
         print("No logs to send.")
         return
 
+    headers = {"Content-Type": "application/json"}
+    if loki_org_id:
+        headers["X-Scope-OrgID"] = loki_org_id.strip()
+
     try:
         response = requests.post(
             loki_url,
             json=payload,
             auth=HTTPBasicAuth(loki_user.strip(), loki_password.strip()),
-            headers={"Content-Type": "application/json"}
+            headers=headers
         )
         if response.status_code not in (200, 204):
             print(f"Failed to push logs to Loki. HTTP Status: {response.status_code}")
