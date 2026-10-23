@@ -171,7 +171,7 @@ def deployment(
                 r = session.get(url)
             except requests.exceptions.SSLError as e:
                 raise Exception(
-                    f"SSL Error: Invalid SSL certificates:\n"
+                    f"SSL Error: Invalid Traefik SSL certificates:\n"
                     f"*   --> certificates expire on: {get_ssl_expiry(url)}.\n"
                     f"{e}"
                     )
