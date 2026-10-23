@@ -1,12 +1,12 @@
 from datetime import datetime, timezone
-from cryptography import x509
-from cryptography.hazmat.backends import default_backend
 import os
 import ssl
 import socket
 import time
 from urllib.parse import urlparse
 
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
 from dotenv import load_dotenv
 from pathlib import Path
 import requests
